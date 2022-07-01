@@ -30,6 +30,26 @@ const validationRefVsRetourObjet = (ref, objet) =>{
     return [false, "NotOK"];
 }
 
+/* Création d’une fonction de test des URLs renvoyées par les clics event et l'ID de l'article */
+const validationUrlEtID = async (objetURL, objetID) =>{
+    // console.log(objetURL);
+    // console.log(objetID);
+    // console.log(objetURL.split("?id="));
+    const refListObjets = await getRefObjets();
+    // console.log(refListObjets.refListObjets);
+    for (index in refListObjets.refListObjets) {
+        // console.log(refListObjets.refListObjets[index]._id);
+        // console.log(objetID);
+        // console.log(objetURL.split("?id=")[1]);
+        // console.log(refListObjets.refListObjets[index]._id);
+        if (refListObjets.refListObjets[index]._id === objetID &&
+            objetURL.split("?id=")[1] === refListObjets.refListObjets[index]._id) {
+                return [true, "OK"];
+        }
+    }
+    return [false, "NotOK"];
+}
+
 /*--------------------------------------------------------------------------------------*/
 /* Functions for getting information from API directly or from 'archived' API responses */
 
@@ -165,6 +185,37 @@ const ecritureInnerHTML = (listElements) => {
     return texte;
 };
 
+/* Function in order to add event listener to articles */
+const addEventListenerToItems = (object) => {
+    if (object.hasChildNodes()) {
+        for (element of object.childNodes) {
+            element.addEventListener("click", clicOnItems);
+        }
+        return 0
+    } else {
+        return 301;
+    }
+}
+
+/* Function in order to store article ID from URL */
+const clicOnItems = async (event) => {
+    event.preventDefault();
+    console.log("CLIC!!!");
+    console.log(event.currentTarget.href);
+    const urlClicked = new URL(event.currentTarget.href)
+    const urlClickedSearch = new URLSearchParams(urlClicked.search);
+    if (urlClickedSearch.has("id")) {
+        const urlId = urlClickedSearch.get("id");
+        // console.log(urlId);
+        // Verification :
+        const verifUrlEtId = await validationUrlEtID(event.currentTarget.href, urlId);
+        console.log("    Validation de l'URL et de l'ID' : " + verifUrlEtId);
+        // window.open(urlClicked, "_self");
+    } else {
+        console.log("Aie");
+        return 302;
+    }
+}
 
 
 /*--------------------------------------------------------------------------------------*/
@@ -195,6 +246,12 @@ const main = async () => {
         // console.log(affichageListKanaps.innerHTML);
     console.log("    Validation de l'objet retourné : " + validationRefVsRetourObjet(refListObjets.innerHTML, affichageListKanaps.innerHTML));
 
+    // Définition des évènements de clic sur les articles
+    const parentContainer = document.getElementById("items")
+    console.log("Definition of the event clic for all items in #items block :");
+        // console.log(parentContainer);
+    const returnAddEventListenerToItems = addEventListenerToItems(parentContainer);
+        // console.log(returnAddEventListenerToItems);
 
 
 

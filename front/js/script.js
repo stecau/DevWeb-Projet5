@@ -108,6 +108,31 @@ const ecritureInnerHTML = (listElements) => {
     return texte;
 };
 
+/* Function in order to add event listener to articles */
+const addEventListenerToItems = (object) => {
+    if (object.hasChildNodes()) {
+        for (element of object.childNodes) {
+            element.addEventListener("click", clicOnItems);
+        }
+        return 0
+    } else {
+        return 301;
+    }
+}
+
+/* Function in order to store article ID from URL */
+const clicOnItems = async (event) => {
+    event.preventDefault();
+    const urlClicked = new URL(event.currentTarget.href)
+    const urlClickedSearch = new URLSearchParams(urlClicked.search);
+    if (urlClickedSearch.has("id")) {
+        const urlId = urlClickedSearch.get("id");
+        window.open(urlClicked, "_self");
+    } else {
+        console.log("Aie");
+        return 302;
+    }
+}
 /*--------------------------------------------------------------------------------------*/
 
 
@@ -120,6 +145,9 @@ const main = async () => {
     const localStorageListKanaps = updateLocalStorage("listArticle", listKanapElements);
     // Update 'accueil' page
     const affichageListKanaps = updateAccueilPage(localStorageListKanaps);
+    // Add event 'click' on articles
+    const parentContainer = document.getElementById("items")
+    const returnAddEventListenerToItems = addEventListenerToItems(parentContainer);
 
 };
 
