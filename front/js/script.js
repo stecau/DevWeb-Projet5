@@ -50,6 +50,7 @@ const getAPIElementKanap = (productID) => fetch("http://localhost:3000/api/produ
 /*--------------------------------------------------------------------------------------*/
 /* Functions for posting order and getting information from API directly */
 
+
 /*--------------------------------------------------------------------------------------*/
 
 

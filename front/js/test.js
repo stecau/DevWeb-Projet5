@@ -201,6 +201,7 @@ const main = async () => {
 
 
 
+
     let indexKanap = 0;
     console.log("====");
     console.log("Le 1er Kanap de la liste est (en interrogeant l'API directement):");
