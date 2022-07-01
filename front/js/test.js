@@ -49,6 +49,8 @@ const validationUrlEtID = async (objetURL, objetID) =>{
     }
     return [false, "NotOK"];
 }
+/*--------------------------------------------------------------------------------------*/
+
 
 /*--------------------------------------------------------------------------------------*/
 /* Functions for getting information from API directly or from 'archived' API responses */
@@ -210,7 +212,7 @@ const clicOnItems = async (event) => {
         // Verification :
         const verifUrlEtId = await validationUrlEtID(event.currentTarget.href, urlId);
         console.log("    Validation de l'URL et de l'ID' : " + verifUrlEtId);
-        // window.open(urlClicked, "_self");
+        window.open(urlClicked, "_self");
     } else {
         console.log("Aie");
         return 302;
