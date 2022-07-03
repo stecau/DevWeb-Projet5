@@ -41,7 +41,7 @@ const validationRefVsRetourObjet = (ref, objet) =>{
 }
 
 /* Création d’une fonction de test de l'ID récupéré avec l'URL */
-const validationId = (refObjet, objetURL, objetID) =>{
+const validationId = (refObjet, objetURL, objetID) => {
     const url = new URL(objetURL)
     // console.log(refObjet);
     // console.log(url);
@@ -54,6 +54,26 @@ const validationId = (refObjet, objetURL, objetID) =>{
         } else {
             return [false, "NotOK"];
         }
+    }
+    return [false, "NotOK"];
+}
+
+const validationPageProduitRefVsRetourObjet = (objetID, refObjets, objetList) => {
+    // console.log(objetID);
+    // console.log(refObjets[objetID]);
+    // console.log(objetList);
+    let listKeys = ["image", "name", "price", "description", "colors"];
+    let listBoolean = [];
+    for (index in objetList) {
+        // console.log(objetList[index]);
+        // console.log(objetList[index].outerHTML);
+        // console.log(refObjets[objetID][listKeys[index]]);
+        // console.log(refObjets[objetID][listKeys[index]] === objetList[index].outerHTML);
+        listBoolean.push(refObjets[objetID][listKeys[index]] === objetList[index].outerHTML);
+        // console.log(listBoolean);
+    }
+    if (!listBoolean.includes(false)) {
+        return [true, "OK"];
     }
     return [false, "NotOK"];
 }
@@ -135,7 +155,7 @@ const updateLocalStorage = (cle, object) => {
 /*--------------------------------------------------------------------------------------*/
 /* Functions for page 'Product' and its dynamical modification */
 /* Récupération of the ID from the URL */
-const recuperationIdFromURL = () => {
+const getIdFromURL = () => {
     let localUrl = new URL(window.location.href);
     // console.log(localUrl);
     const localUrlSearch = new URLSearchParams(localUrl.search);
@@ -148,6 +168,55 @@ const recuperationIdFromURL = () => {
         return 302;
     }
 }
+
+/* Function in order to modify the 'product' page */
+const updateProductPage = (elementKanap) => {
+    // item__img, <!-- <img src="../images/logo.png" alt="Photographie d'un canapé"> -->
+    const containerImgSrc = document.getElementsByClassName("item__img")[0];
+    const childImg = createImg(containerImgSrc, elementKanap.imageUrl, elementKanap.altTxt)
+    // title, <!-- Nom du produit -->
+    const titleData = document.getElementById("title");
+    titleData.textContent = elementKanap.name;
+    // price, <!-- 42 -->
+    const priceData = document.getElementById("price")
+    priceData.textContent = elementKanap.price;
+    // description, <!-- Dis enim malesuada risus sapien gravida nulla nisl arcu. -->
+    const descriptionData = document.getElementById("description");
+    descriptionData.textContent = elementKanap.description;
+    // colors, children of (boucle car plusieurs couleurs) = <!-- <option value="vert">vert</option> -->
+    const colorData = document.getElementById("colors");
+    colorData.innerHTML = ecritureInnerHTML(elementKanap.colors);
+
+    return [childImg, titleData, priceData, descriptionData, colorData];
+};
+
+/* Sub Function in order to write the innerHTML text for img */
+const ecritureInnerHTMLForImg = (src, alt) => {
+    let texte = '<img src="' + src + '" alt="' + alt + '">';
+    return texte;
+};
+
+/* Sub Function in order to create img */
+const createImg = (parent, src, alt) => {
+    const newImg = document.createElement("img");
+    newImg.src = src;
+    newImg.alt = alt;
+    parent.appendChild(newImg);
+    return newImg;
+};
+
+/* Sub Function in order to write the innerHTML text for colors */
+const ecritureInnerHTML = (listElements) => {
+    // console.log(listElements);
+    let texte = '<option value="">--SVP, choisissez une couleur --</option>';
+    for (index in listElements) {
+        texte += '<option value="' + listElements[index] + '">' + listElements[index] + '</option>';
+    }
+    // console.log(texte);
+    return texte;
+};
+/*--------------------------------------------------------------------------------------*/
+
 /*--------------------------------------------------------------------------------------*/
 
 
@@ -159,7 +228,7 @@ const main = async () => {
         // console.log(refListObjets)
 
     // Récupération de l'ID du Kanap avec l'url de la page :
-    const idKanap = recuperationIdFromURL();
+    const idKanap = getIdFromURL();
     console.log("Local URL - article ID : idKanap");
         // console.log(idKanap);
     console.log("    Validation de l'objet retourné : " + validationId(refListObjets.refListIDvsURL, window.location.href, idKanap));
@@ -177,22 +246,10 @@ const main = async () => {
     console.log("    Validation de l'objet retourné : " + validationRefVsRetourObjet(getRefObjectFromID(refListObjets.refListObjets, idKanap), localStorageKanap));
 
     // Modification de la page produit :
-    // const affichageListKanaps = updateAccueilPage(localStorageKanap);
-    // console.log("Update page Acceuil - objet parent mis à jour :");
-        // console.log(affichageListKanaps.innerHTML);
-    // console.log("    Validation de l'objet retourné : " + validationRefVsRetourObjet(refListObjets.innerHTML, affichageListKanaps.innerHTML));
-
-    // Définition des évènements de clic sur les articles
-    // ...
-
-
-
-
-
-
-
-
-
+    const setKanapInformation = updateProductPage(localStorageKanap);
+    console.log("Update page Produit - plusieurs objets mis à jour :");
+        // console.log(setKanapInformation);
+    console.log("    Validation de l'objet retourné : " + validationPageProduitRefVsRetourObjet(idKanap, refListObjets.innerHTML.produit, setKanapInformation));
 };
 
 /*--------------------------------------------------------------------------------------*/

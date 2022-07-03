@@ -9,8 +9,6 @@ const getAPIElementKanap = (productID) => fetch("http://localhost:3000/api/produ
         }
     })
     .then(function(value) {
-        // console.log("Return data from 'getAPIElementKanap(productID)': ");
-        // console.log(value);
         return value;
     })
     .catch(function(err) {
@@ -29,16 +27,11 @@ const getAPIElementKanap = (productID) => fetch("http://localhost:3000/api/produ
 /* functions in order to stock articles list or other object depending of the key */
 const updateLocalStorage = (cle, object) => {
     let localStorage = window.localStorage;
-    // console.log("Local Storage :");
-    // console.log(localStorage);
     let returnObject = 0;
-    // console.log("Stockage dans le local storage de la liste des articles disponibles à la vente :")
     let texte = JSON.stringify(object);
     switch (cle) {
         case "listArticle":
             if (localStorage) {
-                // console.log("Local Storage - texte:");
-                // console.log(texte);
                 localStorage.setItem("listArticles", texte);
             } else {
                 returnObject = 202; // Erreur l'objet n'est pas correct
@@ -48,8 +41,6 @@ const updateLocalStorage = (cle, object) => {
         
         case "article":
             if (localStorage) {
-                // console.log("Local Storage - texte:");
-                // console.log(texte);
                 localStorage.setItem("article", texte);
             } else {
                 returnObject = 202; // Erreur l'objet n'est pas correct
@@ -62,8 +53,6 @@ const updateLocalStorage = (cle, object) => {
                 returnObject = 201;
             };
     };
-    // console.log("Local Storage - objet retourné :");
-    // console.log(JSON.parse(returnObject));
     return returnObject
 };
 
@@ -73,31 +62,75 @@ const updateLocalStorage = (cle, object) => {
 /*--------------------------------------------------------------------------------------*/
 /* Functions for page 'Product' and its dynamical modification */
 /* Récupération of the ID from the URL */
-const recuperationIdFromURL = () => {
+const getIdFromURL = () => {
     let localUrl = new URL(window.location.href);
-    // console.log(localUrl);
     const localUrlSearch = new URLSearchParams(localUrl.search);
-    // console.log(localUrlSearch);
     if (localUrlSearch.has("id")) {
-        // console.log(localUrlSearch.get("id"));
         return localUrlSearch.get("id");
     } else {
         console.log("Aie");
         return 302;
     }
 }
+
+/* Function in order to modify the 'product' page */
+const updateProductPage = (elementKanap) => {
+    // item__img, <!-- <img src="../images/logo.png" alt="Photographie d'un canapé"> -->
+    const containerImgSrc = document.getElementsByClassName("item__img")[0];
+    const childImg = createImg(containerImgSrc, elementKanap.imageUrl, elementKanap.altTxt)
+    // title, <!-- Nom du produit -->
+    const titleData = document.getElementById("title");
+    titleData.textContent = elementKanap.name;
+    // price, <!-- 42 -->
+    const priceData = document.getElementById("price")
+    priceData.textContent = elementKanap.price;
+    // description, <!-- Dis enim malesuada risus sapien gravida nulla nisl arcu. -->
+    const descriptionData = document.getElementById("description");
+    descriptionData.textContent = elementKanap.description;
+    // colors, children of (boucle car plusieurs couleurs) = <!-- <option value="vert">vert</option> -->
+    const colorData = document.getElementById("colors");
+    colorData.innerHTML = ecritureInnerHTML(elementKanap.colors);
+
+    return [childImg, titleData, priceData, descriptionData, colorData];
+};
+
+/* Sub Function in order to write the innerHTML text for img */
+const ecritureInnerHTMLForImg = (src, alt) => {
+    let texte = '<img src="' + src + '" alt="' + alt + '">';
+    return texte;
+};
+
+/* Sub Function in order to create img */
+const createImg = (parent, src, alt) => {
+    const newImg = document.createElement("img");
+    newImg.src = src;
+    newImg.alt = alt;
+    parent.appendChild(newImg);
+    return newImg;
+};
+
+/* Sub Function in order to write the innerHTML text for colors */
+const ecritureInnerHTML = (listElements) => {
+    let texte = '<option value="">--SVP, choisissez une couleur --</option>';
+    for (index in listElements) {
+        texte += '<option value="' + listElements[index] + '">' + listElements[index] + '</option>';
+    }
+    return texte;
+};
 /*--------------------------------------------------------------------------------------*/
 
 
 /*--------------------------------------------------------------------------------------*/
 /* Function MAIN of the web site */
 const main = async () => {
-    // Récupération de l'ID du Kanap avec l'url de la page :
-    const idKanap = recuperationIdFromURL();
-    // Recupération de l'objet Kanap par l'API avec son ID :
+    // Get Kanap's ID with product page URL :
+    const idKanap = getIdFromURL();
+    // Get Kanap element from API with its ID :
     const kanapElement = await getAPIElementKanap(idKanap);
-    // Stockage de l'objet canapé dans le Local Storage :
+    // Store Kanap element in the Local Storage :
     const localStorageKanap = updateLocalStorage("article", kanapElement);
+    // Update 'product' page
+    const setKanapInformation = updateProductPage(localStorageKanap);
 };
 
 /*--------------------------------------------------------------------------------------*/
