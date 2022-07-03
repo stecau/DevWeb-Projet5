@@ -246,35 +246,34 @@ const main = async () => {
     const affichageListKanaps = updateAccueilPage(localStorageListKanaps);
     console.log("Update page Acceuil - objet parent mis à jour :");
         // console.log(affichageListKanaps.innerHTML);
-    console.log("    Validation de l'objet retourné : " + validationRefVsRetourObjet(refListObjets.innerHTML, affichageListKanaps.innerHTML));
+    console.log("    Validation de l'objet retourné : " + validationRefVsRetourObjet(refListObjets.innerHTML.accueil, affichageListKanaps.innerHTML));
 
     // Définition des évènements de clic sur les articles
     const parentContainer = document.getElementById("items")
     console.log("Definition of the event clic for all items in #items block :");
         // console.log(parentContainer);
     const returnAddEventListenerToItems = addEventListenerToItems(parentContainer);
-        // console.log(returnAddEventListenerToItems);
+    if (returnAddEventListenerToItems === 0) {
+        console.log("    Validation de l'objet retourné : true,OK");
+    } else {
+        console.log("    Validation de l'objet retourné : false,NotOK");
+    };
 
 
+    // let indexKanap = 0;
+    // console.log("====");
+    // console.log("Le 1er Kanap de la liste est (en interrogeant l'API directement):");
+    // let idKanap = await getAPIProductIdFromIndex(indexKanap);
+    // let KanapElement2 = await getAPIElementKanap(idKanap);
+    // console.log(KanapElement2);
+    // console.log("====");
 
-
-
-
-
-    let indexKanap = 0;
-    console.log("====");
-    console.log("Le 1er Kanap de la liste est (en interrogeant l'API directement):");
-    let idKanap = await getAPIProductIdFromIndex(indexKanap);
-    let KanapElement2 = await getAPIElementKanap(idKanap);
-    console.log(KanapElement2);
-    console.log("====");
-
-    console.log("====");
-    console.log("Le 1er Kanap de la liste est (sans interroger l'API):");
-    let idKanapSansAPI = getProductIdFromIndex(listKanapElements, indexKanap);
-    let KanapElement2SansAPI = await getAPIElementKanap(idKanapSansAPI);
-    console.log(KanapElement2SansAPI);
-    console.log("====");
+    // console.log("====");
+    // console.log("Le 1er Kanap de la liste est (sans interroger l'API):");
+    // let idKanapSansAPI = getProductIdFromIndex(listKanapElements, indexKanap);
+    // let KanapElement2SansAPI = await getAPIElementKanap(idKanapSansAPI);
+    // console.log(KanapElement2SansAPI);
+    // console.log("====");
 
 };
 
