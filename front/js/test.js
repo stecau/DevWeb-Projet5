@@ -167,7 +167,7 @@ const updateAccueilPage = (listElements) => {
 const ecritureInnerHTML = (listElements) => {
     // console.log("Update page Acceuil - liste des objets :");
     // console.log(listElements);
-    let texte = "";
+    let texte = ``;
     for (index in listElements) {
         // console.log("Element ${i} :");
         // console.log(listElements[index]._id);
@@ -175,15 +175,16 @@ const ecritureInnerHTML = (listElements) => {
         // console.log(listElements[index].altTxt);
         // console.log(listElements[index].name);
         // console.log(listElements[index].description);
-        texte += '<a href="./product.html?id=' + listElements[index]._id + '">';
-        texte += '<article><img src="' + listElements[index].imageUrl + '" alt="' + listElements[index].altTxt + '">';
-        texte += '<h3 class="productName">' + listElements[index].name + '</h3>';
-        texte += '<p class="productDescription">' + listElements[index].description + '</p>';
-        texte += '</article>';
-        texte += '</a>';
+        texte += 
+`<a href="./product.html?id=${listElements[index]._id}">
+    <article>
+        <img src="${listElements[index].imageUrl}" alt="${listElements[index].altTxt}">
+        <h3 class="productName">${listElements[index].name}</h3>
+        <p class="productDescription">${listElements[index].description}</p>
+    </article>
+</a>`;
         // console.log(texte);
     }
-
     return texte;
 };
 
