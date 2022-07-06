@@ -208,9 +208,9 @@ const createImg = (parent, src, alt) => {
 /* Sub Function in order to write the innerHTML text for colors */
 const ecritureInnerHTML = (listElements) => {
     // console.log(listElements);
-    let texte = '<option value="">--SVP, choisissez une couleur --</option>';
+    let texte = `<option value="">--SVP, choisissez une couleur --</option>`;
     for (index in listElements) {
-        texte += '<option value="' + listElements[index] + '">' + listElements[index] + '</option>';
+        texte += `<option value="${listElements[index]}">${listElements[index]}</option>`;
     }
     // console.log(texte);
     return texte;

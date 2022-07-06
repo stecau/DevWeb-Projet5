@@ -22,44 +22,6 @@ const getAPIElementKanap = (productID) => fetch("http://localhost:3000/api/produ
 
 
 /*--------------------------------------------------------------------------------------*/
-/* Functions for Local Storage */
-
-/* functions in order to stock articles list or other object depending of the key */
-const updateLocalStorage = (cle, object) => {
-    let localStorage = window.localStorage;
-    let returnObject = 0;
-    let texte = JSON.stringify(object);
-    switch (cle) {
-        case "listArticle":
-            if (localStorage) {
-                localStorage.setItem("listArticles", texte);
-            } else {
-                returnObject = 202; // Erreur l'objet n'est pas correct
-            }
-            returnObject = JSON.parse(localStorage.getItem("listArticles"));
-            break;
-        
-        case "article":
-            if (localStorage) {
-                localStorage.setItem("article", texte);
-            } else {
-                returnObject = 202; // Erreur l'objet n'est pas correct
-            }
-            returnObject = JSON.parse(localStorage.getItem("article"));
-            break;
-
-        default:
-            if (!returnObject === 0) {
-                returnObject = 201;
-            };
-    };
-    return returnObject
-};
-
-/*--------------------------------------------------------------------------------------*/
-
-
-/*--------------------------------------------------------------------------------------*/
 /* Functions for page 'Product' and its dynamical modification */
 /* Récupération of the ID from the URL */
 const getIdFromURL = () => {
@@ -94,12 +56,6 @@ const updateProductPage = (elementKanap) => {
     return [childImg, titleData, priceData, descriptionData, colorData];
 };
 
-/* Sub Function in order to write the innerHTML text for img */
-const ecritureInnerHTMLForImg = (src, alt) => {
-    let texte = '<img src="' + src + '" alt="' + alt + '">';
-    return texte;
-};
-
 /* Sub Function in order to create img */
 const createImg = (parent, src, alt) => {
     const newImg = document.createElement("img");
@@ -111,9 +67,9 @@ const createImg = (parent, src, alt) => {
 
 /* Sub Function in order to write the innerHTML text for colors */
 const ecritureInnerHTML = (listElements) => {
-    let texte = '<option value="">--SVP, choisissez une couleur --</option>';
+    let texte = `<option value="">--SVP, choisissez une couleur --</option>`;
     for (index in listElements) {
-        texte += '<option value="' + listElements[index] + '">' + listElements[index] + '</option>';
+        texte += `<option value="${listElements[index]}">${listElements[index]}</option>`;
     }
     return texte;
 };
@@ -127,10 +83,8 @@ const main = async () => {
     const idKanap = getIdFromURL();
     // Get Kanap element from API with its ID :
     const kanapElement = await getAPIElementKanap(idKanap);
-    // Store Kanap element in the Local Storage :
-    const localStorageKanap = updateLocalStorage("article", kanapElement);
     // Update 'product' page
-    const setKanapInformation = updateProductPage(localStorageKanap);
+    const setKanapInformation = updateProductPage(kanapElement);
 };
 
 /*--------------------------------------------------------------------------------------*/
