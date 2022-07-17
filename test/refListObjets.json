@@ -143,6 +143,61 @@
             "description":"Mauris molestie laoreet finibus. Aenean scelerisque convallis lacus at dapibus. Morbi imperdiet enim metus rhoncus.",
             "altTxt":"Photo d'un canapé rose, trois places"
         }
+    ],
+    "refListLocalStorage": [
+        {
+            "107fb5b75607497b96722bda5b504926_Blue": {
+                "id": "107fb5b75607497b96722bda5b504926",
+                "color": "Blue",
+                "quantity": 1
+            }
+        },
+        {
+            "107fb5b75607497b96722bda5b504926_White": {
+                "id": "107fb5b75607497b96722bda5b504926",
+                "color": "White",
+                "quantity": 1
+            },
+            "107fb5b75607497b96722bda5b504926_Blue": {
+                "id": "107fb5b75607497b96722bda5b504926",
+                "color": "Blue",
+                "quantity": 1
+            }
+        },
+        {
+            "a6ec5b49bd164d7fbe10f37b6363f9fb_Pink": {
+                "id": "a6ec5b49bd164d7fbe10f37b6363f9fb",
+                "color": "Pink",
+                "quantity": 1
+            },
+            "107fb5b75607497b96722bda5b504926_White": {
+                "id": "107fb5b75607497b96722bda5b504926",
+                "color": "White",
+                "quantity": 1
+            },
+            "107fb5b75607497b96722bda5b504926_Blue": {
+                "id": "107fb5b75607497b96722bda5b504926",
+                "color": "Blue",
+                "quantity": 1
+            }
+        },
+        {
+            "a6ec5b49bd164d7fbe10f37b6363f9fb_Pink": {
+                "id": "a6ec5b49bd164d7fbe10f37b6363f9fb",
+                "color": "Pink",
+                "quantity": 1
+            },
+            "107fb5b75607497b96722bda5b504926_White": {
+                "id": "107fb5b75607497b96722bda5b504926",
+                "color": "White",
+                "quantity": 1
+            },
+            "107fb5b75607497b96722bda5b504926_Blue": {
+                "id": "107fb5b75607497b96722bda5b504926",
+                "color": "Blue",
+                "quantity": 3
+            }
+        }
     ]
 }
 
