@@ -23,7 +23,7 @@ const getAPIElementKanap = (productID) => fetch("http://localhost:3000/api/produ
 
 /*--------------------------------------------------------------------------------------*/
 /* Functions for page 'Product' and its dynamical modification */
-/* Récupération of the ID from the URL */
+/* Get ID from the URL */
 const getIdFromURL = () => {
     let localUrl = new URL(window.location.href);
     const localUrlSearch = new URLSearchParams(localUrl.search);
@@ -77,6 +77,40 @@ const ecritureInnerHTML = (listElements) => {
 
 
 /*--------------------------------------------------------------------------------------*/
+/* Functions for Local Storage and store article in the cart */
+/* Function to add click event and define the behaviour */
+const storeCartInLocalStorage = () => {
+    const addToCartButton = document.getElementById("addToCart");
+    addToCartButton.addEventListener("click", getSelectedParameter);
+};
+
+/* Function to get the article options from the page */
+const getSelectedParameter = async (event) => {
+    const colorSelector = document.getElementById("colors");
+    const quantitySelector = document.getElementById("quantity");
+    if (!colorSelector.value == "" && parseInt(quantitySelector.value, 10) > 0) {
+        storeSelectedParameterInLocalStorage(colorSelector.value, parseInt(quantitySelector.value, 10));
+    } else {
+        // Affichage message pour choisir une color et une quantité
+        console.log("pb");
+    }
+};
+
+/* Sub function to store article in Local Storage */
+const storeSelectedParameterInLocalStorage = (color, quantity) => {
+    let localStorage = window.localStorage;
+    let id = getIdFromURL();
+    if (localStorage.getItem(id + "_" + color)) {
+        // L'article est dans le panier avec l'option de couleur choisie => on augmente la quantité
+        quantity = JSON.parse(localStorage.getItem(id + "_" + color)).quantity + quantity;
+    };
+    let item = {"id": id, "quantity": quantity, "color": color};
+    localStorage.setItem(id + "_" + color, JSON.stringify(item));
+};
+/*--------------------------------------------------------------------------------------*/
+
+
+/*--------------------------------------------------------------------------------------*/
 /* Function MAIN of the web site */
 const main = async () => {
     // Get Kanap's ID with product page URL :
@@ -85,6 +119,10 @@ const main = async () => {
     const kanapElement = await getAPIElementKanap(idKanap);
     // Update 'product' page
     const setKanapInformation = updateProductPage(kanapElement);
+    // Add click event on button in order to User add article to cart
+    const articleInLocalStorage = storeCartInLocalStorage();
+    
+
 };
 
 /*--------------------------------------------------------------------------------------*/

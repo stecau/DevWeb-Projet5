@@ -77,6 +77,30 @@ const validationPageProduitRefVsRetourObjet = (objetID, refObjets, objetList) =>
     }
     return [false, "NotOK"];
 }
+
+/* Création d’une fonction de test du Local Storage avec comparaison avec un object du fichier JSON de référence */
+const validationRefVsLocalStorage = (ref, objet, inc) => {
+    for (key in ref[inc]) {
+        // console.log(key);
+        // console.log(ref[inc][key]);
+        // console.log(JSON.parse(objet.getItem(key)));
+        const objetLocalStorage = JSON.parse(objet.getItem(key))
+        if (ref[inc][key].id !== objetLocalStorage.id || ref[inc][key].color !== objetLocalStorage.color
+            || ref[inc][key].quantity !== objetLocalStorage.quantity) {
+                return [false, "NotOK"];
+        }
+    }
+    return [true, "OK"];
+}
+
+/* Création de la fonction de test du local storage : */
+const testLocalStorage = async (inc) => {
+    const refListObjets = await getRefObjets();
+    // 1er test avec le premier canapé en blue et quantité à 1 :
+    console.log(`Local Storage - objet retourné : localStorage pour incrément ${inc}`);
+    // console.log(refListObjets.refListLocalStorage[inc]);
+    console.log("    Validation de l'objet retourné : " + validationRefVsLocalStorage(refListObjets.refListLocalStorage, window.localStorage, inc));
+}
 /*--------------------------------------------------------------------------------------*/
 
 
@@ -217,6 +241,38 @@ const ecritureInnerHTML = (listElements) => {
 };
 /*--------------------------------------------------------------------------------------*/
 
+
+/*--------------------------------------------------------------------------------------*/
+/* Functions for Local Storage and store article in the cart */
+/* Function to add click event and define the behaviour */
+const storeCartInLocalStorage = () => {
+    const addToCartButton = document.getElementById("addToCart");
+    addToCartButton.addEventListener("click", getSelectedParameter);
+};
+
+/* Function to get the article options from the page */
+const getSelectedParameter = async (event) => {
+    const colorSelector = document.getElementById("colors");
+    const quantitySelector = document.getElementById("quantity");
+    if (!colorSelector.value == "" && parseInt(quantitySelector.value, 10) > 0) {
+        storeSelectedParameterInLocalStorage(colorSelector.value, parseInt(quantitySelector.value, 10));
+    } else {
+        // Affichage message pour choisir une color et une quantité
+        console.log("pb");
+    }
+};
+
+/* Sub function to store article in Local Storage */
+const storeSelectedParameterInLocalStorage = (color, quantity) => {
+    let localStorage = window.localStorage;
+    let id = getIdFromURL();
+    if (localStorage.getItem(id + "_" + color)) {
+        // L'article est dans le panier avec l'option de couleur choisie => on augmente la quantité
+        quantity = JSON.parse(localStorage.getItem(id + "_" + color)).quantity + quantity;
+    };
+    let item = {"id": id, "quantity": quantity, "color": color};
+    localStorage.setItem(id + "_" + color, JSON.stringify(item));
+};
 /*--------------------------------------------------------------------------------------*/
 
 
@@ -239,17 +295,14 @@ const main = async () => {
         // console.log(kanapElement);
     console.log("    Validation de l'objet retourné : " + validationRefVsRetourObjet(getRefObjectFromID(refListObjets.refListObjets, idKanap), kanapElement));
 
-    // Stockage de l'objet canapé dans le Local Storage :
-    const localStorageKanap = updateLocalStorage("article", kanapElement);
-    console.log("Local Storage - objet retourné : localStorageKanap");
-        // console.log(localStorageKanap);
-    console.log("    Validation de l'objet retourné : " + validationRefVsRetourObjet(getRefObjectFromID(refListObjets.refListObjets, idKanap), localStorageKanap));
-
     // Modification de la page produit :
-    const setKanapInformation = updateProductPage(localStorageKanap);
+    const setKanapInformation = updateProductPage(kanapElement);
     console.log("Update page Produit - plusieurs objets mis à jour :");
         // console.log(setKanapInformation);
     console.log("    Validation de l'objet retourné : " + validationPageProduitRefVsRetourObjet(idKanap, refListObjets.innerHTML.produit, setKanapInformation));
+
+    // Stockage de l'objet canapé dans le Local Storage lors d'un click :
+    const articleInLocalStorage = storeCartInLocalStorage();
 };
 
 /*--------------------------------------------------------------------------------------*/
