@@ -118,10 +118,54 @@ const alertMessage = (objet, type, texte) => {
 
 
 /*--------------------------------------------------------------------------------------*/
+/* Function when changement occurs in cart page */
+/* Function in order to get quantity event change in article */
+const updateCartPageWhenQuantityChange = () => {
+    const listInputQuantity = document.getElementsByClassName("itemQuantity");
+    for (let indexInputQuantity = 0; indexInputQuantity < listInputQuantity.length; indexInputQuantity++) {
+        const inputQuantity = listInputQuantity[indexInputQuantity];
+        inputQuantity.addEventListener('change', updateQuantityInLocalStorage);
+    }
+};
+
+/* Function in order to suppress event article */
+const updateCartPageWhenSuppress = () => {
+    const listSuppress = document.getElementsByClassName("deleteItem");
+    for (let indexSuppress = 0; indexSuppress < listSuppress.length; indexSuppress++) {
+        const inputSuppress = listSuppress[indexSuppress];
+        inputSuppress.addEventListener('click', updateQuantityInLocalStorage);
+    }
+};
+
+/* Sub function in order to update LocalStorage after change in cart page and update cart page */
+const updateQuantityInLocalStorage = (event) => {
+    // Get variable for localStorage modification
+    const articleId = event.target.closest('article').dataset.id;
+    const articleColor = event.target.closest('article').dataset.color;
+    const localStorageKanap = JSON.parse(window.localStorage.getItem("Kanap"));
+    // Modification of the localStorage quantity
+    if (event.target.tagName === "INPUT") {
+        const localStorageKanapObject = localStorageKanap[articleId + "_" + articleColor];
+        localStorageKanapObject.quantity = parseInt(event.target.value);
+    } else if (event.target.tagName === "P") {
+        delete localStorageKanap[articleId + "_" + articleColor];
+    };
+    window.localStorage.setItem("Kanap", JSON.stringify(localStorageKanap));
+    // Call of the function to update page (price and total)
+    main();
+};
+/*--------------------------------------------------------------------------------------*/
+
+
+/*--------------------------------------------------------------------------------------*/
 /* Function MAIN of the web site */
 const main = async () => {
     // Update 'cart' page with LocalStorage articles
-    const setKanapCartInformation = updateCartPage(window.localStorage);
+    const setKanapCartInformation = await updateCartPage(window.localStorage);
+    // Update 'cart' page and LocalStorage when quantity of article change
+    const setKanapWhenQuantityChange = updateCartPageWhenQuantityChange();
+    // Update 'cart' page and LocalStorage when quantity of article change
+    const setKanapWhenSuppress = updateCartPageWhenSuppress();
 
     // Add alert messages for formulary
     let alertListMessages = [];
