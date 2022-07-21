@@ -28,6 +28,41 @@ const validationRefVsRetourObjet = (ref, objet) =>{
         return [true, "OK"];
     }
     return [false, "NotOK"];
+};
+
+/* Création d’une fonction de test du Local Storage avec comparaison avec un object du fichier JSON de référence */
+const validationRefVsLocalStorage = (ref, objet, inc) => {
+    localStorageKanap = objet.getItem("Kanap");
+    for (key in ref[inc]) {
+        // console.log(key);
+        // console.log(ref[inc][key]);
+        // console.log(JSON.parse(objet.getItem(key)));
+        const objetLocalStorage = JSON.parse(localStorageKanap)
+        if (ref[inc][key].id !== objetLocalStorage[key].id || ref[inc][key].color !== objetLocalStorage[key].color
+            || ref[inc][key].quantity !== objetLocalStorage[key].quantity) {
+                return [false, "NotOK"];
+        }
+    }
+    return [true, "OK"];
+}
+
+/* Création de la fonction de test du local storage avec changement quantité puis supression : */
+const testChangeQuantityOrSuppress = async (inc, type) => {
+    const refListObjets = await getRefObjets();
+    if (type === "change") {
+        console.log(`Local Storage - objet retourné : localStorage pour incrément ${inc} pour le changement de quantité`);
+            // console.log(refListObjets.refListLocalStorage[inc]);
+        console.log("    Validation de l'objet retourné : " + validationRefVsLocalStorage(refListObjets.refListLocalStorageChangeQuantity, window.localStorage, inc));
+        console.log("    Validation du contenu de la page (liste des articles) : " + validationRefVsRetourObjet(refListObjets.innerHTML["cartChangeQuantity" + (inc + 1).toString(10)], document.getElementById("cart__items").innerHTML));
+        console.log("    Validation du contenu de la page (total) : " + validationRefVsRetourObjet(refListObjets.innerHTML["totalChange" + (inc + 1).toString(10)], document.getElementsByClassName("cart__price")[0].innerHTML));
+    }
+    if (type === "suppress") {
+        console.log(`Local Storage - objet retourné : localStorage pour incrément ${inc} pour la suppression`);
+            // console.log(refListObjets.refListLocalStorage[inc]);
+        console.log("    Validation de l'objet retourné : " + validationRefVsLocalStorage(refListObjets.refListLocalStorageSupress, window.localStorage, inc));
+        console.log("    Validation du contenu de la page (liste des articles) : " + validationRefVsRetourObjet(refListObjets.innerHTML["cartSuppress" + (inc + 1).toString(10)], document.getElementById("cart__items").innerHTML));
+        console.log("    Validation du contenu de la page (total) : " + validationRefVsRetourObjet(refListObjets.innerHTML["totalSuppress" + (inc + 1).toString(10)], document.getElementsByClassName("cart__price")[0].innerHTML));
+    }
 }
 
 /*--------------------------------------------------------------------------------------*/
@@ -153,6 +188,46 @@ const alertMessage = (objet, type, texte) => {
 
 
 /*--------------------------------------------------------------------------------------*/
+/* Function when changement occurs in cart page */
+/* Function in order to get quantity event change in article */
+const updateCartPageWhenQuantityChange = () => {
+    const listInputQuantity = document.getElementsByClassName("itemQuantity");
+    for (let indexInputQuantity = 0; indexInputQuantity < listInputQuantity.length; indexInputQuantity++) {
+        const inputQuantity = listInputQuantity[indexInputQuantity];
+        inputQuantity.addEventListener('change', updateQuantityInLocalStorage);
+    }
+};
+
+/* Function in order to suppress event article */
+const updateCartPageWhenSuppress = () => {
+    const listSuppress = document.getElementsByClassName("deleteItem");
+    for (let indexSuppress = 0; indexSuppress < listSuppress.length; indexSuppress++) {
+        const inputSuppress = listSuppress[indexSuppress];
+        inputSuppress.addEventListener('click', updateQuantityInLocalStorage);
+    }
+};
+
+/* Sub function in order to update LocalStorage after change in cart page and update cart page */
+const updateQuantityInLocalStorage = (event) => {
+    // Get variable for localStorage modification
+    const articleId = event.target.closest('article').dataset.id;
+    const articleColor = event.target.closest('article').dataset.color;
+    const localStorageKanap = JSON.parse(window.localStorage.getItem("Kanap"));
+    // Modification of the localStorage quantity
+    if (event.target.tagName === "INPUT") {
+        const localStorageKanapObject = localStorageKanap[articleId + "_" + articleColor];
+        localStorageKanapObject.quantity = parseInt(event.target.value);
+    } else if (event.target.tagName === "P") {
+        delete localStorageKanap[articleId + "_" + articleColor];
+    };
+    window.localStorage.setItem("Kanap", JSON.stringify(localStorageKanap));
+    // Call of the function to update page (price and total)
+    main();
+};
+/*--------------------------------------------------------------------------------------*/
+
+
+/*--------------------------------------------------------------------------------------*/
 /* Function MAIN of the web site */
 const main = async () => {
     // Recupération de la référence :
@@ -164,6 +239,12 @@ const main = async () => {
     console.log("Update cart page with LocalStorage");
         // console.log(window.localStorage);
     console.log("    Validation de l'objet retourné : " + validationRefVsRetourObjet(refListObjets.innerHTML.cart, document.getElementById("cart__items").innerHTML));
+    console.log("    Validation du contenu de la page (liste des articles) : " + validationRefVsRetourObjet(refListObjets.innerHTML["cart"], document.getElementById("cart__items").innerHTML));
+    console.log("    Validation du contenu de la page (total) : " + validationRefVsRetourObjet(refListObjets.innerHTML["total"], document.getElementsByClassName("cart__price")[0].innerHTML));
+    // Update 'cart' page and LocalStorage when quantity of article change
+    const setKanapWhenQuantityChange = updateCartPageWhenQuantityChange();
+    // Update 'cart' page and LocalStorage when quantity of article change
+    const setKanapWhenSuppress = updateCartPageWhenSuppress();
 
     // Add alert messages for formulary
     let alertListMessages = [];
