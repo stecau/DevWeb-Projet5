@@ -85,12 +85,29 @@ const calculTotalArticleAndPrice = (listElements) => {
     return {"totalArticle": totalArticle, "totalPrice": totalPrice};
 };
 
+/* sub function in order to be able to show alert message */
+const alertMessage = (objet, type, texte) => {
+    if (type === "text") {
+        objet.textContent = `Veuillez renseigner correctement le champs '${texte}'`
+    } else {
+        objet.textContent = `Veuillez renseigner correctement votre '${texte}'`
+    }
+}
+
 
 /*--------------------------------------------------------------------------------------*/
 /* Function MAIN of the web site */
 const main = async () => {
     // Update 'cart' page with LocalStorage articles
     const setKanapCartInformation = updateCartPage(window.localStorage);
+
+    // Add alert messages for formulary
+    let alertListMessages = [];
+    alertListMessages.push(alertMessage(document.getElementById("firstNameErrorMsg"), "text", "Prénom"));
+    alertListMessages.push(alertMessage(document.getElementById("lastNameErrorMsg"), "text", "Nom"));
+    alertListMessages.push(alertMessage(document.getElementById("addressErrorMsg"), "text", "Adresse"));
+    alertListMessages.push(alertMessage(document.getElementById("cityErrorMsg"), "text", "Ville"));
+    alertListMessages.push(alertMessage(document.getElementById("emailErrorMsg"), "text", "Email"));
 
     
 
