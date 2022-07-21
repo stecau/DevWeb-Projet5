@@ -80,13 +80,14 @@ const validationPageProduitRefVsRetourObjet = (objetID, refObjets, objetList) =>
 
 /* Création d’une fonction de test du Local Storage avec comparaison avec un object du fichier JSON de référence */
 const validationRefVsLocalStorage = (ref, objet, inc) => {
+    localStorageKanap = objet.getItem("Kanap");
     for (key in ref[inc]) {
         // console.log(key);
         // console.log(ref[inc][key]);
         // console.log(JSON.parse(objet.getItem(key)));
-        const objetLocalStorage = JSON.parse(objet.getItem(key))
-        if (ref[inc][key].id !== objetLocalStorage.id || ref[inc][key].color !== objetLocalStorage.color
-            || ref[inc][key].quantity !== objetLocalStorage.quantity) {
+        const objetLocalStorage = JSON.parse(localStorageKanap)
+        if (ref[inc][key].id !== objetLocalStorage[key].id || ref[inc][key].color !== objetLocalStorage[key].color
+            || ref[inc][key].quantity !== objetLocalStorage[key].quantity) {
                 return [false, "NotOK"];
         }
     }
@@ -266,12 +267,16 @@ const getSelectedParameter = async (event) => {
 const storeSelectedParameterInLocalStorage = (color, quantity) => {
     let localStorage = window.localStorage;
     let id = getIdFromURL();
-    if (localStorage.getItem(id + "_" + color)) {
-        // L'article est dans le panier avec l'option de couleur choisie => on augmente la quantité
-        quantity = JSON.parse(localStorage.getItem(id + "_" + color)).quantity + quantity;
+    let localStorageKanap = {};
+    if (localStorage.getItem("Kanap")) {
+        localStorageKanap = JSON.parse(localStorage.getItem("Kanap"));
+        if (Object.keys(localStorageKanap).includes(id + "_" + color)) {
+            // Article in cart with the same color option => increase quantity
+            quantity = localStorageKanap[id + "_" + color].quantity + quantity;
+        };
     };
-    let item = {"id": id, "quantity": quantity, "color": color};
-    localStorage.setItem(id + "_" + color, JSON.stringify(item));
+    localStorageKanap[id + "_" + color] = {"id": id, "quantity": quantity, "color": color};
+    localStorage.setItem("Kanap", JSON.stringify(localStorageKanap));
 };
 /*--------------------------------------------------------------------------------------*/
 
