@@ -100,12 +100,16 @@ const getSelectedParameter = async (event) => {
 const storeSelectedParameterInLocalStorage = (color, quantity) => {
     let localStorage = window.localStorage;
     let id = getIdFromURL();
-    if (localStorage.getItem(id + "_" + color)) {
-        // L'article est dans le panier avec l'option de couleur choisie => on augmente la quantité
-        quantity = JSON.parse(localStorage.getItem(id + "_" + color)).quantity + quantity;
+    let localStorageKanap = {};
+    if (localStorage.getItem("Kanap")) {
+        localStorageKanap = JSON.parse(localStorage.getItem("Kanap"));
+        if (Object.keys(localStorageKanap).includes(id + "_" + color)) {
+            // Article in cart with the same color option => increase quantity
+            quantity = localStorageKanap[id + "_" + color].quantity + quantity;
+        };
     };
-    let item = {"id": id, "quantity": quantity, "color": color};
-    localStorage.setItem(id + "_" + color, JSON.stringify(item));
+    localStorageKanap[id + "_" + color] = {"id": id, "quantity": quantity, "color": color};
+    localStorage.setItem("Kanap", JSON.stringify(localStorageKanap));
 };
 /*--------------------------------------------------------------------------------------*/
 

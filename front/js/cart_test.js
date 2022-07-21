@@ -60,44 +60,66 @@ const getAPIElementKanap = (productID) => fetch("http://localhost:3000/api/produ
 /* Functions for page 'Cart' and its dynamical modification */
 /* Get list of article from LocalStorage */
 const updateCartPage = async (localStorage) => {
-    const listOfArticleObjectFromAPI = [];
-    for (let index = 0; index < localStorage.length; index++) {
-        const localStorageObject = JSON.parse(localStorage.getItem(localStorage.key(index)));
+    let listOfArticleObjectFromAPI = [];
+    if (localStorage.getItem("Kanap")) {
+        // Set list of artciles
+        listOfArticleObjectFromAPI = await setListOfArticles(JSON.parse(localStorage.getItem("Kanap")));
+    };
+    // Update Cart page
+    const displayArticle = cartDisplay(listOfArticleObjectFromAPI);
+};
+
+/* Sub function in order to set the list of article to show in cart page */
+const setListOfArticles = async (localStorageKanap) => {
+    const listOfArticle = [];
+    for (const localStorageObject of Object.values(localStorageKanap)) {
         // Get article information from API with its ID and store data in list
-        listOfArticleObjectFromAPI.push({
+        listOfArticle.push({
             "article": await getAPIElementKanap(localStorageObject.id),
             "color": localStorageObject.color,
             "quantite": localStorageObject.quantity
         });
-    }
+    };
+    return listOfArticle;
+};
+
+/* Sub Function in order to write the innerHTML text and text content */
+const cartDisplay = (listOfArticle) => {
+    let innerHtmlText = '<div class="cart__item__content__description"><h2>Votre Panier est vide.</h2><p>Sélectionner nos articles exclusifs pour passer commande.</p></div>';
+    let price = 0;
+    let quantity = 0;
+    if (!listOfArticle.length == 0) {
+        innerHtmlText = ecritureInnerHTML(listOfArticle);
+        const total = calculTotalArticleAndPrice(listOfArticle)
+        price = total.totalArticle;
+        quantity = total.totalPrice;
+    };
     // Modifiy innertHTML of the 'cart__items' section
-    const parentContainer = document.getElementById("cart__items");
-    parentContainer.innerHTML = ecritureInnerHTML(listOfArticleObjectFromAPI);
+    document.getElementById("cart__items").innerHTML = innerHtmlText;
     // Modifiy textcontent of the 'cart__price' div
-    const total = calculTotalArticleAndPrice(listOfArticleObjectFromAPI)
-    document.getElementById("totalQuantity").textContent = total.totalArticle;
-    document.getElementById("totalPrice").textContent = total.totalPrice;
-}
+    document.getElementById("totalQuantity").textContent = price;
+    document.getElementById("totalPrice").textContent = quantity;
+};
 
 /* Sub Function in order to write the innerHTML text */
 const ecritureInnerHTML = (listElements) => {
     let texte = ``;
-    for (index in listElements) {
+    for (const element of Object.values(listElements)) {
         texte += 
-`<article class="cart__item" data-id="${listElements[index].article._id}" data-color="${listElements[index].color}">
+`<article class="cart__item" data-id="${element.article._id}" data-color="${element.color}">
     <div class="cart__item__img">
-        <img src="${listElements[index].article.imageUrl}" alt="${listElements[index].article.altTxt}">
+        <img src="${element.article.imageUrl}" alt="${element.article.altTxt}">
     </div>
     <div class="cart__item__content">
         <div class="cart__item__content__description">
-            <h2>${listElements[index].article.name}</h2>
-            <p>${listElements[index].color}</p>
-            <p>${listElements[index].article.price} €</p>
+            <h2>${element.article.name}</h2>
+            <p>${element.color}</p>
+            <p>${element.article.price} €</p>
         </div>
         <div class="cart__item__content__settings">
             <div class="cart__item__content__settings__quantity">
                 <p>Qté : </p>
-                <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${listElements[index].quantite}">
+                <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${element.quantite}">
             </div>
             <div class="cart__item__content__settings__delete">
                 <p class="deleteItem">Supprimer</p>
@@ -113,9 +135,9 @@ const ecritureInnerHTML = (listElements) => {
 const calculTotalArticleAndPrice = (listElements) => {
     let totalArticle = 0;
     let totalPrice = 0;
-    for (index in listElements) {
-        totalArticle += listElements[index].quantite;
-        totalPrice += listElements[index].quantite * listElements[index].article.price;
+    for (const element of Object.values(listElements)) {
+        totalArticle += element.quantite;
+        totalPrice += element.quantite * element.article.price;
     }
     return {"totalArticle": totalArticle, "totalPrice": totalPrice};
 };
