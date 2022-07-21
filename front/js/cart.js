@@ -107,7 +107,7 @@ const main = async () => {
     alertListMessages.push(alertMessage(document.getElementById("lastNameErrorMsg"), "text", "Nom"));
     alertListMessages.push(alertMessage(document.getElementById("addressErrorMsg"), "text", "Adresse"));
     alertListMessages.push(alertMessage(document.getElementById("cityErrorMsg"), "text", "Ville"));
-    alertListMessages.push(alertMessage(document.getElementById("emailErrorMsg"), "text", "Email"));
+    alertListMessages.push(alertMessage(document.getElementById("emailErrorMsg"), "email", "Email"));
 
     
 
