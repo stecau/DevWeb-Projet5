@@ -107,15 +107,6 @@ const calculTotalArticleAndPrice = (listElements) => {
     return {"totalArticle": totalArticle, "totalPrice": totalPrice};
 };
 
-/* sub function in order to be able to show alert message */
-const alertMessage = (objet, type, texte) => {
-    if (type === "text") {
-        objet.textContent = `Veuillez renseigner correctement le champs '${texte}'`
-    } else {
-        objet.textContent = `Veuillez renseigner correctement votre '${texte}'`
-    }
-}
-
 
 /*--------------------------------------------------------------------------------------*/
 /* Function when changement occurs in cart page */
@@ -159,6 +150,83 @@ const updateQuantityInLocalStorage = (event) => {
 
 /*--------------------------------------------------------------------------------------*/
 /* Function MAIN of the web site */
+/* Function in order to intialize alert messages */
+const initializationAlertMessages = () => {
+    const alertListMessages = [];
+    alertListMessages.push(alertMessage(document.getElementById("firstNameErrorMsg"), "text", "Prénom"));
+    alertListMessages.push(alertMessage(document.getElementById("lastNameErrorMsg"), "text", "Nom"));
+    alertListMessages.push(alertMessage(document.getElementById("addressErrorMsg"), "text", "Adresse"));
+    alertListMessages.push(alertMessage(document.getElementById("cityErrorMsg"), "text", "Ville"));
+    alertListMessages.push(alertMessage(document.getElementById("emailErrorMsg"), "email", "Email"));
+    return alertListMessages;
+};
+
+
+/* sub function in order to be able to show alert message */
+const alertMessage = (objet, type, texte) => {
+    if (type === "text") {
+        objet.textContent = `Veuillez renseigner correctement le champs '${texte}'`
+    } else {
+        objet.textContent = `Veuillez renseigner correctement votre '${texte}'`
+    }
+    return objet;
+};
+
+/* Sub function in order to manage the alert message element display */
+const initializationEventForAlertMessages = async (listObjets) => {
+    for (let indexObjet = 0; indexObjet < listObjets.length; indexObjet++) {
+        const objectAlertMessage = listObjets[indexObjet];
+        const inputAlertMessage = objectAlertMessage.closest('div').getElementsByTagName('input')[0];
+        inputAlertMessage.addEventListener('change', manageAlertMessages);
+    }
+};
+
+/* Sub function managing the display of the message alert with regex */
+const manageAlertMessages = (event) => {
+    const inputAlert = event.target;
+    const objectAlert = inputAlert.closest('div').getElementsByTagName('p')[0];
+    if (inputAlert.type == "text") {
+        if (inputAlert.id == "address") {
+            objectAlert.style.display = isInputValidated(inputAlert, "Address");
+        } else {
+            objectAlert.style.display = isInputValidated(inputAlert, "Text");
+        };
+    } else if (inputAlert.type == "email") {
+        objectAlert.style.display = isInputValidated(inputAlert, "Email");
+    };
+};
+
+/* Sub function for testing regex format of input */
+const isInputValidated = (inputObject, inputFormatExpected) => {
+    if (inputObject.value !== "") {
+        const regexpText = new RegExp('[0123456789]+');
+        const regexpAddress = new RegExp('^[0123456789]+[, ]+');
+        const regexpEmail = /[a-zA-Z0-9!#$%&'*+\-\/=?^_`{|}~.]+@[a-zA-Z0-9]+\.[a-z]+/g;
+        if ((inputFormatExpected === "Text" && !regexpText.test(inputObject.value)) ||
+        (inputFormatExpected === "Address" && regexpAddress.test(inputObject.value)) ||
+        (inputFormatExpected === "Email" && isEmailValid(inputObject.value, regexpEmail))) {
+            return "none";
+        };
+    };
+    return "block";
+};
+
+/* Sub function for length of Email with return value of regexpEmail */
+const isEmailValid = (inputEmail, regexpEmail) => {
+    if (regexpEmail.test(inputEmail)) {
+        const emailLength = inputEmail.length;
+        if (regexpEmail[Symbol.match](inputEmail) != null) {
+            const regexpEmailLength = regexpEmail[Symbol.match](inputEmail)[0].length;
+            return emailLength === regexpEmailLength;
+        };
+    };
+    return false;
+};
+/*--------------------------------------------------------------------------------------*/
+
+
+/*--------------------------------------------------------------------------------------*/
+/* Function MAIN of the web site */
 const main = async () => {
     // Update 'cart' page with LocalStorage articles
     const setKanapCartInformation = await updateCartPage(window.localStorage);
@@ -166,14 +234,10 @@ const main = async () => {
     const setKanapWhenQuantityChange = updateCartPageWhenQuantityChange();
     // Update 'cart' page and LocalStorage when quantity of article change
     const setKanapWhenSuppress = updateCartPageWhenSuppress();
-
     // Add alert messages for formulary
-    let alertListMessages = [];
-    alertListMessages.push(alertMessage(document.getElementById("firstNameErrorMsg"), "text", "Prénom"));
-    alertListMessages.push(alertMessage(document.getElementById("lastNameErrorMsg"), "text", "Nom"));
-    alertListMessages.push(alertMessage(document.getElementById("addressErrorMsg"), "text", "Adresse"));
-    alertListMessages.push(alertMessage(document.getElementById("cityErrorMsg"), "text", "Ville"));
-    alertListMessages.push(alertMessage(document.getElementById("emailErrorMsg"), "email", "Email"));
+    let alertListMessages = initializationAlertMessages();
+    alertListMessages = initializationEventForAlertMessages(alertListMessages);
+    // Add clic event in order to command with the creation of the object for the API POST request
 
     
 
