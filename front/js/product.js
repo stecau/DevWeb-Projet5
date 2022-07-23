@@ -92,7 +92,7 @@ const getSelectedParameter = async (event) => {
         storeSelectedParameterInLocalStorage(colorSelector.value, parseInt(quantitySelector.value, 10));
     } else {
         // Affichage message pour choisir une color et une quantité
-        console.log("pb");
+        alert("Veuillez renseigner une couleur de canapé et une quantité.");
     }
 };
 
