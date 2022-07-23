@@ -149,7 +149,7 @@ const updateQuantityInLocalStorage = (event) => {
 
 
 /*--------------------------------------------------------------------------------------*/
-/* Function MAIN of the web site */
+/* Functions for getting contact information */
 /* Function in order to intialize alert messages */
 const initializationAlertMessages = () => {
     const alertListMessages = [];
@@ -173,12 +173,15 @@ const alertMessage = (objet, type, texte) => {
 };
 
 /* Sub function in order to manage the alert message element display */
-const initializationEventForAlertMessages = async (listObjets) => {
+const initializationEventForAlertMessages = (listObjets) => {
+    let listInputs = [];
     for (let indexObjet = 0; indexObjet < listObjets.length; indexObjet++) {
         const objectAlertMessage = listObjets[indexObjet];
         const inputAlertMessage = objectAlertMessage.closest('div').getElementsByTagName('input')[0];
         inputAlertMessage.addEventListener('change', manageAlertMessages);
+        listInputs.push(inputAlertMessage);
     }
+    return {"listAlertMessages": listObjets, "listInputContact": listInputs};
 };
 
 /* Sub function managing the display of the message alert with regex */
@@ -226,6 +229,84 @@ const isEmailValid = (inputEmail, regexpEmail) => {
 
 
 /*--------------------------------------------------------------------------------------*/
+/* Functions for getting command information */
+/* Function in order to intialize command event */
+const initializationEventCommand = (objectListMessagesAndInputs) => {
+    const commandButton = document.getElementById("order");
+    commandButton.addEventListener('click', (event) => {checkCommand(event, objectListMessagesAndInputs)});
+};
+
+/* Sub function in order to check contact and panier before command */
+const checkCommand = (event, objectListMessagesAndInputs) => {
+    event.preventDefault();
+    if (inputContactValid(objectListMessagesAndInputs)) {
+        const dataCommande = setDataCommand(objectListMessagesAndInputs.listInputContact);
+        console.log(dataCommande);
+    } else {
+        alert("Veuillez renseigner correctement tous les champs du formulaire.\nLes champs non valides sont identiqués par un texte orange.");
+    };
+}
+// const checkCommand = (event) => {
+//     event.preventDefault();
+//     console.log(event);
+//     const listInputContact = [];
+//     listInputContact.push(document.getElementById("firstNameErrorMsg"));
+//     listInputContact.push(document.getElementById("lastNameErrorMsg"));
+//     listInputContact.push(document.getElementById("addressErrorMsg"));
+//     listInputContact.push(document.getElementById("cityErrorMsg"));
+//     listInputContact.push(document.getElementById("emailErrorMsg"));
+//     const listAlertMessages = [];
+//     for (let indexInput = 0; indexInput < listInputContact.length; indexInput++) {
+//         listAlertMessages.push(listInputContact[indexInput].closest('div').getElementsByTagName('p')[0]);
+//     };
+//     console.log(listInputContact);
+//     console.log(listAlertMessages);
+// }
+
+/* Sub function to check if input are ok when command event */
+const inputContactValid = (objectListMessagesAndInputs) => {
+    let booleanValue = true;
+    const listAlertMessages = objectListMessagesAndInputs.listAlertMessages;
+    for (let indexAlertMessage = 0; indexAlertMessage < listAlertMessages.length; indexAlertMessage++) {
+        if (listAlertMessages[indexAlertMessage].style.display === "block" ||
+        listAlertMessages[indexAlertMessage].style.display === "") {
+            booleanValue = false;
+        }
+    };
+    return booleanValue;
+};
+
+/* Sub function in order to generate the 'contact object' and the 'article array' */
+const setDataCommand = (listInputContact) => {
+    const contactObject = setContactObject(listInputContact);
+    const articleArray = setArticleArray();
+    return {"contactObject": contactObject, "articleArray": articleArray};
+};
+
+/* Sub function that generate the 'contact object' */
+const setContactObject = (listInputContact) => {
+    let contactObject = {};
+    for (inputObject of listInputContact) {
+        contactObject[inputObject.id] = inputObject.value;
+    };
+    return contactObject;
+};
+
+/* Sub function that generate the 'article array' */
+const setArticleArray = () => {
+    let articleArray = [];
+    const articleInLocalStorage = JSON.parse(window.localStorage.getItem("Kanap"))
+    for (const [articleKey, articleValues] of Object.entries(articleInLocalStorage)) {
+        if (!articleArray.includes(articleValues.id)) {
+            articleArray.push(articleValues.id);
+        };
+    };
+    return articleArray;
+};
+/*--------------------------------------------------------------------------------------*/
+
+
+/*--------------------------------------------------------------------------------------*/
 /* Function MAIN of the web site */
 const main = async () => {
     // Update 'cart' page with LocalStorage articles
@@ -235,10 +316,10 @@ const main = async () => {
     // Update 'cart' page and LocalStorage when quantity of article change
     const setKanapWhenSuppress = updateCartPageWhenSuppress();
     // Add alert messages for formulary
-    let alertListMessages = initializationAlertMessages();
-    alertListMessages = initializationEventForAlertMessages(alertListMessages);
+    const alertListMessages = initializationAlertMessages();
+    const objectListMessagesAndInputs = initializationEventForAlertMessages(alertListMessages);
     // Add clic event in order to command with the creation of the object for the API POST request
-
+    const initiateCommandEvent = initializationEventCommand(objectListMessagesAndInputs);
     
 
 };
