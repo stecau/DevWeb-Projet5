@@ -22,6 +22,34 @@ const getAPIElementKanap = (productID) => fetch("http://localhost:3000/api/produ
 
 
 /*--------------------------------------------------------------------------------------*/
+/* Functions in order to POST request and get response from API directly for user order */
+
+/* Function to post order to API and get reponse from API*/
+const postAPIOrder = (jsonRequest) => fetch("http://localhost:3000/api/products/order", {
+        method: 'POST',
+        headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(jsonRequest)})
+    .then(function(res) {
+        if (res.ok) {
+            return res.json();
+        }
+    })
+    .then(function(value) {
+        return value;
+    })
+    .catch(function(err) {
+        // Une erreur est survenue
+        console.log("ERREUR return data from 'postAPIOrder(jsonRequest)': ");
+        console.log(err);
+        return 103;
+    });
+/*--------------------------------------------------------------------------------------*/
+
+
+/*--------------------------------------------------------------------------------------*/
 /* Functions for page 'Cart' and its dynamical modification */
 /* Get list of article from LocalStorage */
 const updateCartPage = async (localStorage) => {
@@ -237,11 +265,20 @@ const initializationEventCommand = (objectListMessagesAndInputs) => {
 };
 
 /* Sub function in order to check contact and panier before command */
-const checkCommand = (event, objectListMessagesAndInputs) => {
+const checkCommand = async (event, objectListMessagesAndInputs) => {
     event.preventDefault();
     if (inputContactValid(objectListMessagesAndInputs)) {
         const dataCommande = setDataCommand(objectListMessagesAndInputs.listInputContact);
-        console.log(dataCommande);
+        if (dataCommande.products.length > 0 && dataCommande.products.constructor === Array) {
+            const dataCommandeResponse = await postAPIOrder(dataCommande);
+            if (dataCommandeResponse.orderId) {
+                document.location.assign(`./confirmation.html?order=${dataCommandeResponse.orderId}`)
+            } else {
+                alert("Erreur lors de la commande, veuillez la renouveller.");
+            }
+        } else {
+            alert("Votre panier est vide, veuillez sélectioner au moins un article pour réaliser une commande.");
+        };
     } else {
         alert("Veuillez renseigner correctement tous les champs du formulaire.\nLes champs non valides sont identiqués par un texte orange.");
     };
@@ -280,7 +317,7 @@ const inputContactValid = (objectListMessagesAndInputs) => {
 const setDataCommand = (listInputContact) => {
     const contactObject = setContactObject(listInputContact);
     const articleArray = setArticleArray();
-    return {"contactObject": contactObject, "articleArray": articleArray};
+    return {"contact": contactObject, "products": articleArray};
 };
 
 /* Sub function that generate the 'contact object' */
