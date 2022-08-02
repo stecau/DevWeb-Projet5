@@ -7,14 +7,13 @@ const getIdFromURL = () => {
     if (localUrlSearch.has("order")) {
         return localUrlSearch.get("order");
     } else {
-        console.log("Aie");
+        console.log(`Don't manage getting ID from URL : ${window.location.href}`);
         return 302;
     }
 }
 
 /* Function in order to modify the 'product' page */
-const updateConfirmationPage = (idKanapOrder) => {
-    // title, <!-- Nom du produit -->
+const initiateConfirmationPage = (idKanapOrder) => {
     const orderSpan = document.getElementById("orderId");
     orderSpan.textContent = idKanapOrder;
     return "!!!!! Fin du Projet Kanap !!!!!";
@@ -28,14 +27,14 @@ const main = async () => {
     // Get Order number with 'confirmation' page URL :
     const idKanapOrder = getIdFromURL();
     // Update 'product' page
-    const setKanapOrderInformation = updateConfirmationPage(idKanapOrder);
+    const setKanapOrderInformation = initiateConfirmationPage(idKanapOrder);
     // Empty cart in localStorage
     window.localStorage.removeItem("Kanap");
     console.log(setKanapOrderInformation);
 };
 
 /*--------------------------------------------------------------------------------------*/
-/* Lancement script with main function */
+/* Launch script with main function */
 console.log("Script final de la page confirmation : ne doit pas contenir de message 'log' ou 'ERREUR'");
 main()
 /*--------------------------------------------------------------------------------------*/

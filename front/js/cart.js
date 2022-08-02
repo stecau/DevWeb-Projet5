@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------------------------*/
-/* Functions for getting information from API directly or from 'archived' API responses */
+/* Functions for getting information from API directly */
 
 /* Function to get the products object based on its 'id' from API */
 const getAPIElementKanap = (productID) => fetch("http://localhost:3000/api/products/" + productID)
@@ -12,7 +12,7 @@ const getAPIElementKanap = (productID) => fetch("http://localhost:3000/api/produ
         return value;
     })
     .catch(function(err) {
-        // Une erreur est survenue
+        // An error occured
         console.log("ERREUR return data from 'getAPIElementKanap(productID)': ");
         console.log(err);
         return 102;
@@ -41,7 +41,7 @@ const postAPIOrder = (jsonRequest) => fetch("http://localhost:3000/api/products/
         return value;
     })
     .catch(function(err) {
-        // Une erreur est survenue
+        // An error occured
         console.log("ERREUR return data from 'postAPIOrder(jsonRequest)': ");
         console.log(err);
         return 103;
@@ -52,7 +52,8 @@ const postAPIOrder = (jsonRequest) => fetch("http://localhost:3000/api/products/
 /*--------------------------------------------------------------------------------------*/
 /* Functions for page 'Cart' and its dynamical modification */
 /* Get list of article from LocalStorage */
-const updateCartPage = async (localStorage) => {
+const initiateCartPage = async () => {
+    const localStorage = window.localStorage;
     let listOfArticleObjectFromAPI = [];
     if (localStorage.getItem("Kanap")) {
         // Set list of artciles
@@ -60,6 +61,7 @@ const updateCartPage = async (localStorage) => {
     };
     // Update Cart page
     const displayArticle = cartDisplay(listOfArticleObjectFromAPI);
+    return listOfArticleObjectFromAPI;
 };
 
 /* Sub function in order to set the list of article to show in cart page */
@@ -77,18 +79,22 @@ const setListOfArticles = async (localStorageKanap) => {
 };
 
 /* Sub Function in order to write the innerHTML text and text content */
-const cartDisplay = (listOfArticle) => {
+const cartDisplay = (listOfArticle, initial = true) => {
     let innerHtmlText = '<div class="cart__item__content__description"><h2>Votre Panier est vide.</h2><p>Sélectionner nos articles exclusifs pour passer commande.</p></div>';
     let price = 0;
     let quantity = 0;
     if (!listOfArticle.length == 0) {
-        innerHtmlText = ecritureInnerHTML(listOfArticle);
+        if (initial) {
+            innerHtmlText = ecritureInnerHTML(listOfArticle);
+        };
         const total = calculTotalArticleAndPrice(listOfArticle)
         price = total.totalArticle;
         quantity = total.totalPrice;
     };
     // Modifiy innertHTML of the 'cart__items' section
-    document.getElementById("cart__items").innerHTML = innerHtmlText;
+    if (initial || listOfArticle.length == 0) {
+        document.getElementById("cart__items").innerHTML = innerHtmlText;
+    };
     // Modifiy textcontent of the 'cart__price' div
     document.getElementById("totalQuantity").textContent = price;
     document.getElementById("totalPrice").textContent = quantity;
@@ -139,25 +145,27 @@ const calculTotalArticleAndPrice = (listElements) => {
 /*--------------------------------------------------------------------------------------*/
 /* Function when changement occurs in cart page */
 /* Function in order to get quantity event change in article */
-const updateCartPageWhenQuantityChange = () => {
+const initiateCartPageWhenQuantityChange = (listOfArticleObjectFromAPI) => {
     const listInputQuantity = document.getElementsByClassName("itemQuantity");
     for (let indexInputQuantity = 0; indexInputQuantity < listInputQuantity.length; indexInputQuantity++) {
         const inputQuantity = listInputQuantity[indexInputQuantity];
-        inputQuantity.addEventListener('change', updateQuantityInLocalStorage);
+        inputQuantity.addEventListener('change', (event) => {listOfArticleObjectFromAPI = updateQuantityInLocalStorage(event, listOfArticleObjectFromAPI)});
     }
+    return listOfArticleObjectFromAPI;
 };
 
 /* Function in order to suppress event article */
-const updateCartPageWhenSuppress = () => {
+const initiateCartPageWhenSuppress = (listOfArticleObjectFromAPI) => {
     const listSuppress = document.getElementsByClassName("deleteItem");
     for (let indexSuppress = 0; indexSuppress < listSuppress.length; indexSuppress++) {
         const inputSuppress = listSuppress[indexSuppress];
-        inputSuppress.addEventListener('click', updateQuantityInLocalStorage);
+        inputSuppress.addEventListener('click', (event) => {listOfArticleObjectFromAPI = updateQuantityInLocalStorage(event, listOfArticleObjectFromAPI)});
     }
+    return listOfArticleObjectFromAPI;
 };
 
 /* Sub function in order to update LocalStorage after change in cart page and update cart page */
-const updateQuantityInLocalStorage = (event) => {
+const updateQuantityInLocalStorage = (event, listOfArticleObjectFromAPI) => {
     // Get variable for localStorage modification
     const articleId = event.target.closest('article').dataset.id;
     const articleColor = event.target.closest('article').dataset.color;
@@ -166,20 +174,39 @@ const updateQuantityInLocalStorage = (event) => {
     if (event.target.tagName === "INPUT") {
         const localStorageKanapObject = localStorageKanap[articleId + "_" + articleColor];
         localStorageKanapObject.quantity = parseInt(event.target.value);
+        listOfArticleObjectFromAPI = updateListOfArticle(listOfArticleObjectFromAPI, articleId, articleColor, "INPUT", localStorageKanapObject.quantity);
     } else if (event.target.tagName === "P") {
         delete localStorageKanap[articleId + "_" + articleColor];
+        listOfArticleObjectFromAPI = updateListOfArticle(listOfArticleObjectFromAPI, articleId, articleColor, "P");
+        event.target.closest('article').remove(); // DOM modification (suppress node)
     };
     window.localStorage.setItem("Kanap", JSON.stringify(localStorageKanap));
     // Call of the function to update page (price and total)
-    main();
+    const updateArticle = cartDisplay(listOfArticleObjectFromAPI, false); // DOM Update
+    return listOfArticleObjectFromAPI;
+};
+
+/* Sub function in order to update listOfArticleObjectFromAPI after change in cart page for DOM modification */
+const updateListOfArticle = (listOfArticleObjectFromAPI, articleId, articleColor, changeType, quantity = 0) => {
+    for (const [articleIndex, articleValue] of Object.entries(listOfArticleObjectFromAPI)) {
+        if (articleValue.article._id === articleId && articleValue.color === articleColor) {
+            if (changeType === "INPUT") {
+                articleValue.quantite = quantity;
+            };
+            if (changeType === "P") {
+                listOfArticleObjectFromAPI.splice(articleIndex, 1);
+            };
+        };
+    };
+    return listOfArticleObjectFromAPI;
 };
 /*--------------------------------------------------------------------------------------*/
 
 
 /*--------------------------------------------------------------------------------------*/
 /* Functions for getting contact information */
-/* Function in order to intialize alert messages */
-const initializationAlertMessages = () => {
+/* Function in order to intialize list of alert messages */
+const initiateAlertMessages = () => {
     const alertListMessages = [];
     alertListMessages.push(alertMessage(document.getElementById("firstNameErrorMsg"), "text", "Prénom"));
     alertListMessages.push(alertMessage(document.getElementById("lastNameErrorMsg"), "text", "Nom"));
@@ -189,8 +216,7 @@ const initializationAlertMessages = () => {
     return alertListMessages;
 };
 
-
-/* sub function in order to be able to show alert message */
+/* sub function in order to write alert message */
 const alertMessage = (objet, type, texte) => {
     if (type === "text") {
         objet.textContent = `Veuillez renseigner correctement le champs '${texte}'`
@@ -201,7 +227,7 @@ const alertMessage = (objet, type, texte) => {
 };
 
 /* Sub function in order to manage the alert message element display */
-const initializationEventForAlertMessages = (listObjets) => {
+const initiateEventForAlertMessages = (listObjets) => {
     let listInputs = [];
     for (let indexObjet = 0; indexObjet < listObjets.length; indexObjet++) {
         const objectAlertMessage = listObjets[indexObjet];
@@ -259,7 +285,7 @@ const isEmailValid = (inputEmail, regexpEmail) => {
 /*--------------------------------------------------------------------------------------*/
 /* Functions for getting command information */
 /* Function in order to intialize command event */
-const initializationEventCommand = (objectListMessagesAndInputs) => {
+const initiateEventCommand = (objectListMessagesAndInputs) => {
     const commandButton = document.getElementById("order");
     commandButton.addEventListener('click', (event) => {checkCommand(event, objectListMessagesAndInputs)});
 };
@@ -283,22 +309,6 @@ const checkCommand = async (event, objectListMessagesAndInputs) => {
         alert("Veuillez renseigner correctement tous les champs du formulaire.\nLes champs non valides sont identiqués par un texte orange.");
     };
 }
-// const checkCommand = (event) => {
-//     event.preventDefault();
-//     console.log(event);
-//     const listInputContact = [];
-//     listInputContact.push(document.getElementById("firstNameErrorMsg"));
-//     listInputContact.push(document.getElementById("lastNameErrorMsg"));
-//     listInputContact.push(document.getElementById("addressErrorMsg"));
-//     listInputContact.push(document.getElementById("cityErrorMsg"));
-//     listInputContact.push(document.getElementById("emailErrorMsg"));
-//     const listAlertMessages = [];
-//     for (let indexInput = 0; indexInput < listInputContact.length; indexInput++) {
-//         listAlertMessages.push(listInputContact[indexInput].closest('div').getElementsByTagName('p')[0]);
-//     };
-//     console.log(listInputContact);
-//     console.log(listAlertMessages);
-// }
 
 /* Sub function to check if input are ok when command event */
 const inputContactValid = (objectListMessagesAndInputs) => {
@@ -332,10 +342,12 @@ const setContactObject = (listInputContact) => {
 /* Sub function that generate the 'article array' */
 const setArticleArray = () => {
     let articleArray = [];
-    const articleInLocalStorage = JSON.parse(window.localStorage.getItem("Kanap"))
-    for (const [articleKey, articleValues] of Object.entries(articleInLocalStorage)) {
-        if (!articleArray.includes(articleValues.id)) {
-            articleArray.push(articleValues.id);
+    if (window.localStorage.getItem("Kanap") != null) {
+        const articleInLocalStorage = JSON.parse(window.localStorage.getItem("Kanap"))
+        for (const [articleKey, articleValues] of Object.entries(articleInLocalStorage)) {
+            if (!articleArray.includes(articleValues.id)) {
+                articleArray.push(articleValues.id);
+            };
         };
     };
     return articleArray;
@@ -347,22 +359,20 @@ const setArticleArray = () => {
 /* Function MAIN of the web site */
 const main = async () => {
     // Update 'cart' page with LocalStorage articles
-    const setKanapCartInformation = await updateCartPage(window.localStorage);
+    let setKanapCartInformation = await initiateCartPage();
     // Update 'cart' page and LocalStorage when quantity of article change
-    const setKanapWhenQuantityChange = updateCartPageWhenQuantityChange();
+    setKanapCartInformation = initiateCartPageWhenQuantityChange(setKanapCartInformation);
     // Update 'cart' page and LocalStorage when quantity of article change
-    const setKanapWhenSuppress = updateCartPageWhenSuppress();
+    setKanapCartInformation = initiateCartPageWhenSuppress(setKanapCartInformation);
     // Add alert messages for formulary
-    const alertListMessages = initializationAlertMessages();
-    const objectListMessagesAndInputs = initializationEventForAlertMessages(alertListMessages);
+    const alertListMessages = initiateAlertMessages();
+    const objectListMessagesAndInputs = initiateEventForAlertMessages(alertListMessages);
     // Add clic event in order to command with the creation of the object for the API POST request
-    const initiateCommandEvent = initializationEventCommand(objectListMessagesAndInputs);
-    
-
+    const initiateCommandEvent = initiateEventCommand(objectListMessagesAndInputs);
 };
 
 /*--------------------------------------------------------------------------------------*/
-/* Lancement script with main function */
+/* Launch script with main function */
 console.log("Script final de la page product : ne doit pas contenir de message 'log' ou 'ERREUR'");
 main()
 /*--------------------------------------------------------------------------------------*/

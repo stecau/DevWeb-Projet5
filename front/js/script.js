@@ -60,7 +60,7 @@ const main = async () => {
 /*--------------------------------------------------------------------------------------*/
 
 /*--------------------------------------------------------------------------------------*/
-/* Lancement script with main function */
+/* Launch script with main function */
 console.log("Script final du site : ne doit pas contenir de message 'log' ou 'ERREUR'");
 main()
 /*--------------------------------------------------------------------------------------*/

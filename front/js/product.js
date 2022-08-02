@@ -12,7 +12,7 @@ const getAPIElementKanap = (productID) => fetch("http://localhost:3000/api/produ
         return value;
     })
     .catch(function(err) {
-        // Une erreur est survenue
+        // An error occured
         console.log("ERREUR return data from 'getAPIElementKanap(productID)': ");
         console.log(err);
         return 102;
@@ -30,7 +30,7 @@ const getIdFromURL = () => {
     if (localUrlSearch.has("id")) {
         return localUrlSearch.get("id");
     } else {
-        console.log("Aie");
+        console.log(`Don't manage getting ID from URL : ${window.location.href}`);
         return 302;
     }
 }
@@ -91,7 +91,7 @@ const getSelectedParameter = async (event) => {
     if (!colorSelector.value == "" && parseInt(quantitySelector.value, 10) > 0) {
         storeSelectedParameterInLocalStorage(colorSelector.value, parseInt(quantitySelector.value, 10));
     } else {
-        // Affichage message pour choisir une color et une quantité
+        // Show alert message in order to ask a color and a quantity selection
         alert("Veuillez renseigner une couleur de canapé et une quantité.");
     }
 };
@@ -125,12 +125,10 @@ const main = async () => {
     const setKanapInformation = updateProductPage(kanapElement);
     // Add click event on button in order to User add article to cart
     const articleInLocalStorage = storeCartInLocalStorage();
-    
-
 };
 
 /*--------------------------------------------------------------------------------------*/
-/* Lancement script with main function */
+/* Launch script with main function */
 console.log("Script final de la page product : ne doit pas contenir de message 'log' ou 'ERREUR'");
 main()
 /*--------------------------------------------------------------------------------------*/
