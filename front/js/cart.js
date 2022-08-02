@@ -298,7 +298,7 @@ const checkCommand = async (event, objectListMessagesAndInputs) => {
         if (dataCommande.products.length > 0 && dataCommande.products.constructor === Array) {
             const dataCommandeResponse = await postAPIOrder(dataCommande);
             if (dataCommandeResponse.orderId) {
-                document.location.assign(`./confirmation.html?order=${dataCommandeResponse.orderId}`)
+                document.location.assign(`./confirmation.html?order=${dataCommandeResponse.orderId}#orderId`)
             } else {
                 alert("Erreur lors de la commande, veuillez la renouveller.");
             }
