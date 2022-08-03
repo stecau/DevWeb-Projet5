@@ -1,6 +1,5 @@
 /*--------------------------------------------------------------------------------------*/
 /* Functions for getting information from API directly or from 'archived' API responses */
-
 /* Function to get from the API the list of products */
 const getAPIListKanaps = () => fetch("http://localhost:3000/api/products")
     .then(res => {
@@ -21,7 +20,6 @@ const getAPIListKanaps = () => fetch("http://localhost:3000/api/products")
 
 /*--------------------------------------------------------------------------------------*/
 /* Functions for page 'Accueil' and its dynamical modification */
-
 /* Function in order to modify the 'accueil' page */
 const updateAccueilPage = (listElements) => {
     const parentContainer = document.getElementById("items");
@@ -56,11 +54,9 @@ const main = async () => {
     // Update 'accueil' page
     const affichageListKanaps = updateAccueilPage(listKanapElements);
 };
-
 /*--------------------------------------------------------------------------------------*/
 
 /*--------------------------------------------------------------------------------------*/
 /* Launch script with main function */
-console.log("Script final du site : ne doit pas contenir de message 'log' ou 'ERREUR'");
 main()
 /*--------------------------------------------------------------------------------------*/

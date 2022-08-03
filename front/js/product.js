@@ -1,6 +1,5 @@
 /*--------------------------------------------------------------------------------------*/
 /* Functions for getting information from API directly or from 'archived' API responses */
-
 /* Function to get the products object based on its 'id' from API */
 const getAPIElementKanap = (productID) => fetch("http://localhost:3000/api/products/" + productID)
     .then(function(res) {
@@ -33,7 +32,7 @@ const getIdFromURL = () => {
         console.log(`Don't manage getting ID from URL : ${window.location.href}`);
         return 302;
     }
-}
+};
 
 /* Function in order to modify the 'product' page */
 const updateProductPage = (elementKanap) => {
@@ -129,6 +128,5 @@ const main = async () => {
 
 /*--------------------------------------------------------------------------------------*/
 /* Launch script with main function */
-console.log("Script final de la page product : ne doit pas contenir de message 'log' ou 'ERREUR'");
 main()
 /*--------------------------------------------------------------------------------------*/

@@ -10,7 +10,7 @@ const getIdFromURL = () => {
         console.log(`Don't manage getting ID from URL : ${window.location.href}`);
         return 302;
     }
-}
+};
 
 /* Function in order to modify the 'product' page */
 const initiateConfirmationPage = (idKanapOrder) => {
@@ -35,6 +35,5 @@ const main = async () => {
 
 /*--------------------------------------------------------------------------------------*/
 /* Launch script with main function */
-console.log("Script final de la page confirmation : ne doit pas contenir de message 'log' ou 'ERREUR'");
 main()
 /*--------------------------------------------------------------------------------------*/

@@ -1,6 +1,5 @@
 /*--------------------------------------------------------------------------------------*/
 /* Functions for getting information from API directly */
-
 /* Function to get the products object based on its 'id' from API */
 const getAPIElementKanap = (productID) => fetch("http://localhost:3000/api/products/" + productID)
     .then(function(res) {
@@ -17,13 +16,11 @@ const getAPIElementKanap = (productID) => fetch("http://localhost:3000/api/produ
         console.log(err);
         return 102;
     });
-
 /*--------------------------------------------------------------------------------------*/
 
 
 /*--------------------------------------------------------------------------------------*/
 /* Functions in order to POST request and get response from API directly for user order */
-
 /* Function to post order to API and get reponse from API*/
 const postAPIOrder = (jsonRequest) => fetch("http://localhost:3000/api/products/order", {
         method: 'POST',
@@ -373,6 +370,5 @@ const main = async () => {
 
 /*--------------------------------------------------------------------------------------*/
 /* Launch script with main function */
-console.log("Script final de la page product : ne doit pas contenir de message 'log' ou 'ERREUR'");
 main()
 /*--------------------------------------------------------------------------------------*/
