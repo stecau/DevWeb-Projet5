@@ -88,11 +88,14 @@ const storeCartInLocalStorage = () => {
 const getSelectedParameter = async (event) => {
     const colorSelector = document.getElementById("colors");
     const quantitySelector = document.getElementById("quantity");
-    if (!colorSelector.value == "" && parseInt(quantitySelector.value, 10) > 0) {
-        storeSelectedParameterInLocalStorage(colorSelector.value, parseInt(quantitySelector.value, 10));
+    if (!colorSelector.value == "" && parseInt(quantitySelector.value, 10) > 0 && parseInt(quantitySelector.value, 10) <= 100) {
+        const updated = storeSelectedParameterInLocalStorage(colorSelector.value, parseInt(quantitySelector.value, 10));
+        if (queryCart(updated)) {
+            document.location.assign("./cart.html");
+        }
     } else {
         // Show alert message in order to ask a color and a quantity selection
-        alert("Veuillez renseigner une couleur de canapé et une quantité.");
+        alert("Veuillez renseigner une couleur de canapé et une quantité de 1 à 100.");
     }
 };
 
@@ -101,15 +104,31 @@ const storeSelectedParameterInLocalStorage = (color, quantity) => {
     let localStorage = window.localStorage;
     let id = getIdFromURL();
     let localStorageKanap = {};
-    if (localStorage.getItem("Kanap")) {
+    let updated = true;
+    if (localStorage.getItem("Kanap") != null) {
         localStorageKanap = JSON.parse(localStorage.getItem("Kanap"));
         if (Object.keys(localStorageKanap).includes(id + "_" + color)) {
-            // Article in cart with the same color option => increase quantity
-            quantity = localStorageKanap[id + "_" + color].quantity + quantity;
+            // Article in cart with the same color option => increase quantity until 100
+            if (quantity + localStorageKanap[id + "_" + color].quantity <= 100) {
+                quantity = localStorageKanap[id + "_" + color].quantity + quantity;
+            } else {
+                quantity = localStorageKanap[id + "_" + color].quantity;
+                updated = false;
+                alert(`Quantité non modifiée, la quantité doit être entre 1 et 100 article(s).\nVous avez actuellement ${quantity} article(s) de ce type dans le panier.`);
+            };
         };
     };
     localStorageKanap[id + "_" + color] = {"id": id, "quantity": quantity, "color": color};
     localStorage.setItem("Kanap", JSON.stringify(localStorageKanap));
+    return updated;
+};
+
+/* Sub function in order to ask to user if he wants to see the cart */
+const queryCart = (toUpdate) => {
+    if (toUpdate) {
+        let showCart = window.confirm("Voulez-vous consulter votre panier (Annuler = 'Non', Ok = 'Oui')");
+        return showCart;
+    };
 };
 /*--------------------------------------------------------------------------------------*/
 
