@@ -170,8 +170,13 @@ const updateQuantityInLocalStorage = (event, listOfArticleObjectFromAPI) => {
     // Modification of the localStorage quantity
     if (event.target.tagName === "INPUT") {
         const localStorageKanapObject = localStorageKanap[articleId + "_" + articleColor];
-        localStorageKanapObject.quantity = parseInt(event.target.value);
-        listOfArticleObjectFromAPI = updateListOfArticle(listOfArticleObjectFromAPI, articleId, articleColor, "INPUT", localStorageKanapObject.quantity);
+        if (parseInt(event.target.value) > 0 && parseInt(event.target.value) <= 100) {
+            localStorageKanapObject.quantity = parseInt(event.target.value);
+            listOfArticleObjectFromAPI = updateListOfArticle(listOfArticleObjectFromAPI, articleId, articleColor, "INPUT", localStorageKanapObject.quantity);
+        } else {
+            event.target.value = localStorageKanapObject.quantity;
+            alert("Quantité non modifiée, la quantité doit être entre 1 et 100 article(s).");
+        };
     } else if (event.target.tagName === "P") {
         delete localStorageKanap[articleId + "_" + articleColor];
         listOfArticleObjectFromAPI = updateListOfArticle(listOfArticleObjectFromAPI, articleId, articleColor, "P");
